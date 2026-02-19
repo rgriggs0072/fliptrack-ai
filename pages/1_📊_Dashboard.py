@@ -139,7 +139,9 @@ with left_col:
     
     if category_data:
         df_categories = pd.DataFrame(category_data, columns=['Category', 'Total', 'Count'])
-        df_categories['Total'] = pd.to_numeric(df_categories['Total'], errors='coerce').round(2)
+        
+        # Convert Total to numeric (Snowflake returns as Decimal object)
+        df_categories['Total'] = pd.to_numeric(df_categories['Total'], errors='coerce')
         df_categories['Percentage'] = (df_categories['Total'] / df_categories['Total'].sum() * 100).round(1)
         
         # Bar chart
@@ -236,6 +238,9 @@ timeline_data = cursor.fetchall()
 if timeline_data:
     df_timeline = pd.DataFrame(timeline_data, columns=['Date', 'Amount', 'Type'])
     
+    # Convert date column to datetime
+    df_timeline['Date'] = pd.to_datetime(df_timeline['Date'])
+    
     # Pivot for stacked chart
     df_pivot = df_timeline.pivot_table(
         index='Date',
@@ -245,7 +250,8 @@ if timeline_data:
         fill_value=0
     )
     
-    st.area_chart(df_pivot)
+    # Use st.line_chart instead of area_chart for better date handling
+    st.line_chart(df_pivot)
     
     # Cumulative spending
     st.subheader("📊 Cumulative Spending")
@@ -263,7 +269,11 @@ if timeline_data:
     cumulative_data = cursor.fetchall()
     df_cumulative = pd.DataFrame(cumulative_data, columns=['Date', 'Amount', 'Cumulative'])
     
-    st.line_chart(df_cumulative.set_index('Date')['Cumulative'])
+    # Convert date to datetime
+    df_cumulative['Date'] = pd.to_datetime(df_cumulative['Date'])
+    df_cumulative = df_cumulative.set_index('Date')
+    
+    st.line_chart(df_cumulative['Cumulative'])
 else:
     st.info("No timeline data yet!")
 
