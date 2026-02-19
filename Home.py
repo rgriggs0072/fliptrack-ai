@@ -213,20 +213,54 @@ if user_command:
                     sql_prompt = f"""
                     User question: "{user_command}"
                     
-                    Database schema:
+                    CRITICAL: This is a SNOWFLAKE database. You MUST use Snowflake SQL syntax EXACTLY as shown in examples.
+                    
+                    Schema:
                     - PROJECTS: project_id, project_name, address, project_type, purchase_price, total_spent_ci, total_spent_mi
-                    - EXPENSES: expense_id, project_id, expense_date, amount, investment_type (CI/MI), vendor_name, description, category
+                    - EXPENSES: expense_id, project_id, expense_date (DATE type), amount, investment_type (CI/MI), vendor_name, description, category
                     - Categories: Acquisition, Closing Costs, Demo, Cleanup, Concrete, Framing, Plumbing, Electrical, HVAC, Roofing, Drywall, Painting, Flooring, Materials, Utilities, etc.
                     
                     Current project_id: '{project_id}'
                     
-                    Generate a SQL query to answer the user's question. The query should:
-                    - Filter by project_id = '{project_id}' when querying EXPENSES
-                    - Use proper aggregation (SUM, COUNT, AVG, etc.)
-                    - Return relevant columns for display
-                    - Be safe (read-only SELECT queries)
+                    WORKING EXAMPLE QUERIES (copy these patterns exactly):
                     
-                    Respond with ONLY the SQL query, no explanations or markdown.
+                    Example 1 - Time-based spending with text search:
+                    Question: "How much spent on lumber in last 6 months?"
+                    SQL: SELECT SUM(amount) as total_lumber_spending
+                         FROM EXPENSES 
+                         WHERE project_id = '{project_id}' 
+                         AND expense_date >= DATEADD('month', -6, CURRENT_DATE())
+                         AND (LOWER(description) LIKE '%lumber%' OR LOWER(vendor_name) LIKE '%lumber%' OR category = 'Materials')
+                    
+                    Example 2 - Top vendor:
+                    Question: "Who is my most expensive vendor?"
+                    SQL: SELECT vendor_name, SUM(amount) as total_spent
+                         FROM EXPENSES 
+                         WHERE project_id = '{project_id}'
+                         GROUP BY vendor_name
+                         ORDER BY total_spent DESC
+                         LIMIT 1
+                    
+                    Example 3 - Category total:
+                    Question: "How much spent on plumbing?"
+                    SQL: SELECT SUM(amount) as total_plumbing
+                         FROM EXPENSES 
+                         WHERE project_id = '{project_id}' 
+                         AND category = 'Plumbing'
+                    
+                    SNOWFLAKE DATE SYNTAX (use these exact patterns):
+                    - 6 months ago: DATEADD('month', -6, CURRENT_DATE())
+                    - 1 year ago: DATEADD('year', -1, CURRENT_DATE())
+                    - 30 days ago: DATEADD('day', -30, CURRENT_DATE())
+                    - This month: expense_date >= DATE_TRUNC('month', CURRENT_DATE())
+                    
+                    IMPORTANT RULES:
+                    - ALWAYS include: WHERE project_id = '{project_id}'
+                    - Use DATEADD('month', -6, CURRENT_DATE()) for date math
+                    - Use LOWER() for case-insensitive text matching
+                    - Search description, vendor_name, AND category for keywords
+                    
+                    Generate ONLY the SQL query (no markdown, no explanation).
                     """
                     
                     sql_response = claude.messages.create(
