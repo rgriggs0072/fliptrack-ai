@@ -9,12 +9,13 @@ import snowflake.connector
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 
-@st.cache_resource
+@st.cache_resource(ttl=3600)  # Cache for 1 hour (3600 seconds)
 def get_connection():
     """
     Create and cache Snowflake connection.
     Uses RSA key pair authentication from secrets.toml
     Supports both file path (local dev) and embedded key (cloud deployment)
+    Connection is cached for 1 hour to prevent token expiration issues.
     """
     
     # Check if private key is embedded in secrets or file path
