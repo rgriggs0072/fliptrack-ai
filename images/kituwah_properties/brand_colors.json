@@ -1,0 +1,23 @@
+{
+  "company": "Kituwah Properties, LLC",
+  "colors": {
+    "primary_red": "#D32F2F",
+    "dark_red": "#B71C1C",
+    "roof_red": "#E53935",
+    "text_dark": "#4E342E",
+    "cream": "#F5F5DC",
+    "accent_green": "#81C784",
+    "door_brown": "#8D6E63",
+    "window_blue": "#64B5F6"
+  },
+  "typography": {
+    "heading_font": "Georgia, serif",
+    "body_font": "Arial, sans-serif"
+  },
+  "contact": {
+    "owner": "Steve Griggs",
+    "phone": "214.293.2398",
+    "email": "sg.krupkinlaw@gmail.com",
+    "tagline": "We buy & sell houses"
+  }
+}

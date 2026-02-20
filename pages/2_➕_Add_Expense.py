@@ -17,13 +17,20 @@ sys.path.append(str(Path(__file__).parent.parent))
 from utils.auth import check_authentication
 from utils.snowflake_connection import get_connection, get_client_database
 from agents.voice_agent import VoiceAgent
+from utils.branding import get_brand, apply_custom_css
+
+# Load brand
+brand = get_brand("kituwah_properties")
 
 # Page config
 st.set_page_config(
-    page_title="Add Expense - FlipTrack AI",
+    page_title=f"Add Expense - {brand['company']}",
     page_icon="➕",
     layout="wide"
 )
+
+# Apply branding
+apply_custom_css(brand)
 
 # Check authentication
 if not check_authentication():
@@ -86,7 +93,7 @@ with tab1:
     if audio_bytes:
         st.audio(audio_bytes, format="audio/wav")
         
-        if st.button("🚀 Process Voice Recording", type="primary", use_container_width=True):
+        if st.button("🚀 Process Voice Recording", type="primary", width="stretch"):
             
             with st.spinner("🎧 Transcribing audio..."):
                 voice_agent = VoiceAgent()
@@ -154,14 +161,14 @@ with tab1:
         col1, col2, col3 = st.columns([1, 1, 1])
         
         with col1:
-            if st.button("❌ Cancel", use_container_width=True):
+            if st.button("❌ Cancel", width="stretch"):
                 # Clear session state
                 del st.session_state.voice_parsed
                 del st.session_state.voice_transcript
                 st.rerun()
         
         with col3:
-            if st.button("💾 Save Expense", type="primary", use_container_width=True):
+            if st.button("💾 Save Expense", type="primary", width="stretch"):
                 
                 project_id = project_options[parsed['project']]
                 
@@ -233,7 +240,7 @@ with tab3:
         
         description = st.text_area("Description (optional)")
         
-        submitted = st.form_submit_button("💾 Save Expense", type="primary", use_container_width=True)
+        submitted = st.form_submit_button("💾 Save Expense", type="primary", width="stretch")
         
         if submitted:
             if amount and vendor:

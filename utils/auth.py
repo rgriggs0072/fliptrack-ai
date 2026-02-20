@@ -27,11 +27,42 @@ def check_authentication():
 
 def show_login_page():
     """
-    Display login form.
+    Display login form with client branding.
     """
     
-    st.markdown('<h1 class="main-header">🏠 FlipTrack AI</h1>', unsafe_allow_html=True)
-    st.markdown('<p class="subtitle">AI-First Property Investment Tracking</p>', unsafe_allow_html=True)
+    # Load Kituwah branding
+    import json
+    try:
+        with open("images/kituwah_properties/brand_colors.json") as f:
+            brand = json.load(f)
+        primary_color = brand['colors']['primary_red']
+    except:
+        primary_color = "#D32F2F"  # Fallback
+    
+    # Custom CSS with brand colors
+    st.markdown(f"""
+    <style>
+        .login-header {{
+            text-align: center;
+            margin-bottom: 2rem;
+        }}
+        .brand-title {{
+            color: {primary_color};
+            font-size: 2rem;
+            font-weight: bold;
+            margin-top: 1rem;
+        }}
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # Display logo
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        try:
+            st.image("images/kituwah_properties/logo.svg", width=300)
+        except:
+            st.markdown('<h1 class="main-header">🏠 FlipTrack AI</h1>', unsafe_allow_html=True)
+            st.markdown('<p class="subtitle">AI-First Property Investment Tracking</p>', unsafe_allow_html=True)
     
     st.divider()
     
@@ -44,7 +75,7 @@ def show_login_page():
             email = st.text_input("Email", placeholder="you@company.com")
             password = st.text_input("Password", type="password")
             
-            submit = st.form_submit_button("Login", use_container_width=True, type="primary")
+            submit = st.form_submit_button("Login", width="stretch", type="primary")
             
             if submit:
                 if authenticate_user(email, password):

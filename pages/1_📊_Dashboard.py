@@ -14,13 +14,20 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from utils.auth import check_authentication
 from utils.snowflake_connection import get_connection, get_client_database
+from utils.branding import get_brand, apply_custom_css
+
+# Load brand
+brand = get_brand("kituwah_properties")
 
 # Page config
 st.set_page_config(
-    page_title="Dashboard - FlipTrack AI",
+    page_title=f"Dashboard - {brand['company']}",
     page_icon="📊",
     layout="wide"
 )
+
+# Apply branding
+apply_custom_css(brand)
 
 # Check authentication
 if not check_authentication():
@@ -153,7 +160,7 @@ with left_col:
                 'Total': '${:,.2f}',
                 'Percentage': '{:.1f}%'
             }),
-            use_container_width=True,
+            width="stretch",
             hide_index=True
         )
     else:
@@ -307,7 +314,7 @@ if recent:
         df_recent.style.format({
             'Amount': '${:,.2f}'
         }),
-        use_container_width=True,
+        width="stretch",
         hide_index=True
     )
 else:

@@ -13,13 +13,20 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from utils.auth import check_authentication
 from agents.excel_import_agent import ExcelImportAgent
+from utils.branding import get_brand, apply_custom_css
+
+# Load brand
+brand = get_brand("kituwah_properties")
 
 # Page config
 st.set_page_config(
-    page_title="Import Data - FlipTrack AI",
+    page_title=f"Import Data - {brand['company']}",
     page_icon="📥",
     layout="wide"
 )
+
+# Apply branding
+apply_custom_css(brand)
 
 # Check authentication
 if not check_authentication():
@@ -54,7 +61,7 @@ if uploaded_file:
             # Skip first 2 rows (title row and blank row), use row 3 as header
             df = pd.read_excel(uploaded_file, header=2)
         
-        st.dataframe(df.head(10), use_container_width=True)
+        st.dataframe(df.head(10), width="stretch")
         st.caption(f"Showing first 10 of {len(df)} rows")
         
         st.divider()
@@ -121,7 +128,7 @@ if uploaded_file:
         col1, col2, col3 = st.columns([2, 1, 1])
         
         with col2:
-            if st.button("🚀 Start AI Import", type="primary", use_container_width=True):
+            if st.button("🚀 Start AI Import", type="primary", width="stretch"):
                 with st.spinner("🤖 AI is importing and categorizing..."):
                     
                     # Progress bar
@@ -156,10 +163,10 @@ if uploaded_file:
                     if result.get('sample_categorizations'):
                         with st.expander("🔍 Sample AI Categorizations"):
                             sample_df = pd.DataFrame(result['sample_categorizations'])
-                            st.dataframe(sample_df, use_container_width=True)
+                            st.dataframe(sample_df, width="stretch")
         
         with col3:
-            if st.button("❌ Cancel", use_container_width=True):
+            if st.button("❌ Cancel", width="stretch"):
                 st.rerun()
     
     except Exception as e:
@@ -190,5 +197,5 @@ else:
         'CI/M': ['CI', 'CI', 'CI']
     }
     
-    st.dataframe(pd.DataFrame(example_data), use_container_width=True)
+    st.dataframe(pd.DataFrame(example_data), width="stretch")
     st.caption("Your file can have any column names - AI will figure it out!")

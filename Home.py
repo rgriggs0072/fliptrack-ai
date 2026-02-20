@@ -15,40 +15,21 @@ sys.path.append(str(Path(__file__).parent))
 
 from utils.snowflake_connection import get_connection
 from utils.auth import check_authentication
+from utils.branding import get_brand, apply_custom_css, display_logo
+
+# Load brand
+brand = get_brand("kituwah_properties")
 
 # Page config
 st.set_page_config(
-    page_title="FlipTrack AI",
+    page_title=f"{brand['company']} - FlipTrack AI",
     page_icon="🏠",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS
-st.markdown("""
-<style>
-    .main-header {
-        font-size: 3rem;
-        font-weight: 700;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 0;
-    }
-    .subtitle {
-        font-size: 1.2rem;
-        color: #666;
-        margin-top: 0;
-    }
-    .metric-card {
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        border-left: 4px solid #667eea;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-</style>
-""", unsafe_allow_html=True)
+# Apply custom branding CSS
+apply_custom_css(brand)
 
 # Check authentication
 if not check_authentication():
@@ -58,9 +39,13 @@ if not check_authentication():
 user_info = st.session_state.get('user_info', {})
 client_name = user_info.get('client_name', 'Guest')
 
-# Header
-st.markdown('<h1 class="main-header">🏠 FlipTrack AI</h1>', unsafe_allow_html=True)
-st.markdown(f'<p class="subtitle">Welcome back, {client_name}!</p>', unsafe_allow_html=True)
+# Header with logo
+col1, col2 = st.columns([1, 3])
+with col1:
+    display_logo(brand, size="small")
+with col2:
+    st.markdown(f'<h1 class="main-header">{brand["company"]}</h1>', unsafe_allow_html=True)
+    st.markdown(f'<p class="subtitle">Welcome back, {client_name}!</p>', unsafe_allow_html=True)
 
 st.divider()
 
@@ -162,9 +147,9 @@ if user_command:
                 
                 Which page do they want?
                 - ADD_EXPENSE: add, record, enter expense/payment
-                - DASHBOARD: view dashboard, see data, metrics
-                - EXPORT: generate report, export, Excel
-                - IMPORT: import, upload spreadsheet
+                - DASHBOARD: view dashboard, see data, metrics, analytics
+                - EXPORT: generate report, export, summary report, investor report
+                - IMPORT: import, upload spreadsheet, upload data
                 
                 Respond with ONLY the action code.
                 """
@@ -190,126 +175,12 @@ if user_command:
                     st.success("✅ Opening data import...")
                     st.switch_page("pages/3_📥_Import_Data.py")
             
-            # DATA_QUERY - Answer with SQL
+            # DATA_QUERY - Route to AI Data Intelligence
             elif "DATA_QUERY" in intent:
-                from utils.snowflake_connection import get_connection, get_client_database
-                
-                conn = get_connection()
-                database, schema = get_client_database()
-                cursor = conn.cursor()
-                
-                # Get user's project info
-                cursor.execute(f"USE DATABASE {database}")
-                cursor.execute(f"USE SCHEMA {schema}")
-                
-                cursor.execute("SELECT project_id, project_name FROM PROJECTS LIMIT 1")
-                project = cursor.fetchone()
-                project_id = project[0] if project else None
-                
-                if not project_id:
-                    st.error("No projects found!")
-                else:
-                    # Have AI generate SQL
-                    sql_prompt = f"""
-                    User question: "{user_command}"
-                    
-                    CRITICAL: This is a SNOWFLAKE database. You MUST use Snowflake SQL syntax EXACTLY as shown in examples.
-                    
-                    Schema:
-                    - PROJECTS: project_id, project_name, address, project_type, purchase_price, total_spent_ci, total_spent_mi
-                    - EXPENSES: expense_id, project_id, expense_date (DATE type), amount, investment_type (CI/MI), vendor_name, description, category
-                    - Categories: Acquisition, Closing Costs, Demo, Cleanup, Concrete, Framing, Plumbing, Electrical, HVAC, Roofing, Drywall, Painting, Flooring, Materials, Utilities, etc.
-                    
-                    Current project_id: '{project_id}'
-                    
-                    WORKING EXAMPLE QUERIES (copy these patterns exactly):
-                    
-                    Example 1 - Time-based spending with text search:
-                    Question: "How much spent on lumber in last 6 months?"
-                    SQL: SELECT SUM(amount) as total_lumber_spending
-                         FROM EXPENSES 
-                         WHERE project_id = '{project_id}' 
-                         AND expense_date >= DATEADD('month', -6, CURRENT_DATE())
-                         AND (LOWER(description) LIKE '%lumber%' OR LOWER(vendor_name) LIKE '%lumber%' OR category = 'Materials')
-                    
-                    Example 2 - Top vendor:
-                    Question: "Who is my most expensive vendor?"
-                    SQL: SELECT vendor_name, SUM(amount) as total_spent
-                         FROM EXPENSES 
-                         WHERE project_id = '{project_id}'
-                         GROUP BY vendor_name
-                         ORDER BY total_spent DESC
-                         LIMIT 1
-                    
-                    Example 3 - Category total:
-                    Question: "How much spent on plumbing?"
-                    SQL: SELECT SUM(amount) as total_plumbing
-                         FROM EXPENSES 
-                         WHERE project_id = '{project_id}' 
-                         AND category = 'Plumbing'
-                    
-                    SNOWFLAKE DATE SYNTAX (use these exact patterns):
-                    - 6 months ago: DATEADD('month', -6, CURRENT_DATE())
-                    - 1 year ago: DATEADD('year', -1, CURRENT_DATE())
-                    - 30 days ago: DATEADD('day', -30, CURRENT_DATE())
-                    - This month: expense_date >= DATE_TRUNC('month', CURRENT_DATE())
-                    
-                    IMPORTANT RULES:
-                    - ALWAYS include: WHERE project_id = '{project_id}'
-                    - Use DATEADD('month', -6, CURRENT_DATE()) for date math
-                    - Use LOWER() for case-insensitive text matching
-                    - Search description, vendor_name, AND category for keywords
-                    
-                    Generate ONLY the SQL query (no markdown, no explanation).
-                    """
-                    
-                    sql_response = claude.messages.create(
-                        model="claude-sonnet-4-20250514",
-                        max_tokens=500,
-                        messages=[{"role": "user", "content": sql_prompt}]
-                    )
-                    
-                    sql_query = sql_response.content[0].text.strip()
-                    
-                    # Clean up SQL (remove markdown if present)
-                    sql_query = sql_query.replace("```sql", "").replace("```", "").strip()
-                    
-                    # Execute the query
-                    try:
-                        cursor.execute(sql_query)
-                        results = cursor.fetchall()
-                        columns = [desc[0] for desc in cursor.description] if cursor.description else []
-                        
-                        if results:
-                            # Show results
-                            st.success("✅ Here's what I found:")
-                            
-                            # If single value, show as metric
-                            if len(results) == 1 and len(columns) == 1:
-                                value = results[0][0]
-                                if isinstance(value, (int, float)):
-                                    st.metric(label="Result", value=f"${value:,.2f}" if value > 100 else f"{value:,.2f}")
-                                else:
-                                    st.info(f"**{value}**")
-                            
-                            # If table, show as dataframe
-                            else:
-                                df = pd.DataFrame(results, columns=columns)
-                                st.dataframe(df, use_container_width=True, hide_index=True)
-                            
-                            # Show the SQL query in expander
-                            with st.expander("🔍 SQL Query Used"):
-                                st.code(sql_query, language="sql")
-                        
-                        else:
-                            st.info("No results found for your query.")
-                    
-                    except Exception as e:
-                        st.error(f"Query error: {e}")
-                        with st.expander("🐛 Debug Info"):
-                            st.code(sql_query, language="sql")
-                
-                cursor.close()
+                st.success("🧠 Opening AI Data Intelligence to answer your question...")
+                # Store the question in session state so AI Data Intelligence can use it
+                st.session_state.pending_question = user_command
+                st.switch_page("pages/5_🧠_AI_Data_Intelligence.py")
         
         except Exception as e:
             st.error(f"Error: {e}")
@@ -333,7 +204,7 @@ project_data = {
 import pandas as pd
 df = pd.DataFrame(project_data)
 
-st.dataframe(df, use_container_width=True, hide_index=True)
+st.dataframe(df, width="stretch", hide_index=True)
 
 # Info boxes
 st.divider()
@@ -362,4 +233,4 @@ with info_col2:
 
 # Footer
 st.divider()
-st.caption("FlipTrack AI - Powered by Claude & Snowflake | © 2026")
+st.caption("FlipTrack AI - Powered by Claude & Chainlink Analytics LLC. | © 2026")

@@ -1,7 +1,7 @@
 """
 FlipTrack AI - Export Report (AI-Generated Excel)
 =================================================
-AI generates professional investor-ready Excel reports.
+AI generates professional investor-ready Excel reports with client branding.
 """
 
 import streamlit as st
@@ -15,13 +15,20 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from utils.auth import check_authentication
 from utils.snowflake_connection import get_connection, get_client_database
+from utils.branding import get_brand, apply_custom_css
+
+# Load brand
+brand = get_brand("kituwah_properties")
 
 # Page config
 st.set_page_config(
-    page_title="Export Report - FlipTrack AI",
+    page_title=f"Export Report - {brand['company']}",
     page_icon="📄",
     layout="wide"
 )
+
+# Apply branding
+apply_custom_css(brand)
 
 # Check authentication
 if not check_authentication():
@@ -72,7 +79,7 @@ with col2:
 # Generate button
 st.divider()
 
-if st.button("🚀 Generate Excel Report", type="primary", use_container_width=True):
+if st.button("🚀 Generate Excel Report", type="primary", width="stretch"):
     
     with st.spinner("🤖 AI is generating your professional report..."):
         
@@ -153,9 +160,17 @@ if st.button("🚀 Generate Excel Report", type="primary", use_container_width=T
         
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
             
-            # Summary sheet
+            # Summary sheet with company branding
             summary_data = {
                 'Metric': [
+                    '=== COMPANY INFO ===',
+                    'Company',
+                    'Owner',
+                    'Phone',
+                    'Email',
+                    'Tagline',
+                    '',
+                    '=== PROJECT INFO ===',
                     'Project Name',
                     'Address',
                     'Project Type',
@@ -163,10 +178,12 @@ if st.button("🚀 Generate Excel Report", type="primary", use_container_width=T
                     'Purchase Date',
                     'Purchase Price',
                     '',
+                    '=== INVESTMENT SUMMARY ===',
                     'Total Invested',
-                    'Cash Investment (CI)',
-                    'Financed/Maintenance (MI)',
+                    'Capital Investment (CI)',
+                    'Maintenance Investment (MI)',
                     '',
+                    '=== PROJECT STATS ===',
                     'Total Expenses Logged',
                     'Number of Vendors',
                     'Days Active',
@@ -174,6 +191,14 @@ if st.button("🚀 Generate Excel Report", type="primary", use_container_width=T
                     'Report Generated'
                 ],
                 'Value': [
+                    '',
+                    brand['company'],
+                    brand['contact']['owner'],
+                    brand['contact']['phone'],
+                    brand['contact']['email'],
+                    brand['contact'].get('tagline', ''),
+                    '',
+                    '',
                     project_name,
                     address or 'N/A',
                     proj_type,
@@ -181,9 +206,11 @@ if st.button("🚀 Generate Excel Report", type="primary", use_container_width=T
                     purchase_date.strftime('%Y-%m-%d') if purchase_date else 'N/A',
                     f'${purchase_price:,.2f}' if purchase_price else 'N/A',
                     '',
+                    '',
                     f'${(spent_ci or 0) + (spent_mi or 0):,.2f}',
                     f'${spent_ci:,.2f} ({spent_ci / ((spent_ci or 0) + (spent_mi or 1)) * 100:.1f}%)' if spent_ci else '$0',
                     f'${spent_mi:,.2f} ({spent_mi / ((spent_ci or 1) + (spent_mi or 0)) * 100:.1f}%)' if spent_mi else '$0',
+                    '',
                     '',
                     len(df_expenses),
                     len(df_vendors),
@@ -235,7 +262,7 @@ if st.button("🚀 Generate Excel Report", type="primary", use_container_width=T
             file_name=f"FlipTrack_Report_{project_name.replace(' ', '_')}_{datetime.now().strftime('%Y%m%d')}.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             type="primary",
-            use_container_width=True
+            width="stretch"
         )
         
         # Show preview
@@ -245,16 +272,16 @@ if st.button("🚀 Generate Excel Report", type="primary", use_container_width=T
         tab1, tab2, tab3, tab4 = st.tabs(["Summary", "Expenses", "Categories", "Vendors"])
         
         with tab1:
-            st.dataframe(df_summary, use_container_width=True, hide_index=True)
+            st.dataframe(df_summary, width="stretch", hide_index=True)
         
         with tab2:
-            st.dataframe(df_expenses, use_container_width=True, hide_index=True)
+            st.dataframe(df_expenses, width="stretch", hide_index=True)
         
         with tab3:
-            st.dataframe(df_categories, use_container_width=True, hide_index=True)
+            st.dataframe(df_categories, width="stretch", hide_index=True)
         
         with tab4:
-            st.dataframe(df_vendors, use_container_width=True, hide_index=True)
+            st.dataframe(df_vendors, width="stretch", hide_index=True)
 
 cursor.close()
 
