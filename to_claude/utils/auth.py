@@ -57,19 +57,18 @@ def show_login_page():
     
     # Display logo
     col1, col2, col3 = st.columns([1, 2, 1])
-    # with col2:
-    #     try:
-    #         st.image("images/kituwah_properties/logo.svg", width=300)
-    #     except:
-    #         st.markdown('<h1 class="main-header">🏠 FlipTrack AI</h1>', unsafe_allow_html=True)
-    #         st.markdown('<p class="subtitle">AI-First Property Investment Tracking</p>', unsafe_allow_html=True)
+    with col2:
+        try:
+            st.image("images/kituwah_properties/logo.svg", width=300)
+        except:
+            st.markdown('<h1 class="main-header">🏠 FlipTrack AI</h1>', unsafe_allow_html=True)
+            st.markdown('<p class="subtitle">AI-First Property Investment Tracking</p>', unsafe_allow_html=True)
     
-    # st.divider()
+    st.divider()
     
     col1, col2, col3 = st.columns([1, 2, 1])
     
     with col2:
-        st.markdown('<h1 class="main-header">🏠 FlipTrack AI</h1>', unsafe_allow_html=True)
         st.subheader("🔐 Login")
         
         with st.form("login_form"):

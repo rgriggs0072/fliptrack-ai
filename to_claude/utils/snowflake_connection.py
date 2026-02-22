@@ -48,8 +48,7 @@ def get_connection():
         user=st.secrets["snowflake"]["user"],
         private_key=pkb,
         warehouse=st.secrets["snowflake"]["warehouse"],
-        role=st.secrets["snowflake"]["role"],
-        autocommit=True  # Required — without this, INSERTs are silently rolled back
+        role=st.secrets["snowflake"]["role"]
     )
     
     return conn

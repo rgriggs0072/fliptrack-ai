@@ -15,7 +15,6 @@ sys.path.append(str(Path(__file__).parent.parent))
 from utils.auth import check_authentication
 from utils.snowflake_connection import get_connection, get_client_database
 from utils.branding import get_brand, apply_custom_css
-from utils.sidebar import render_sidebar
 
 # Load brand
 brand = get_brand("kituwah_properties")
@@ -33,9 +32,6 @@ apply_custom_css(brand)
 # Check authentication
 if not check_authentication():
     st.stop()
-
-# ── Sidebar ────────────────────────────────────────────────────────────────────────────────
-render_sidebar(brand)
 
 # Get connection
 conn = get_connection()

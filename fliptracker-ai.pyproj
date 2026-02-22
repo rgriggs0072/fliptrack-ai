@@ -11,6 +11,7 @@
     <OutputPath>.</OutputPath>
     <Name>fliptracker-ai</Name>
     <RootNamespace>fliptracker-ai</RootNamespace>
+    <SuppressEnvironmentCreationPrompt>True</SuppressEnvironmentCreationPrompt>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,7 +22,38 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="agents\excel_import_agent.py" />
+    <Compile Include="agents\query_agent.py" />
+    <Compile Include="agents\vendor_intel_agent.py" />
+    <Compile Include="agents\voice_agent.py" />
+    <Compile Include="agents\__init__.py" />
     <Compile Include="fliptracker_ai.py" />
+    <Compile Include="Home.py" />
+    <Compile Include="pages\1_📊_Dashboard.py" />
+    <Compile Include="pages\2_➕_Add_Expense.py" />
+    <Compile Include="pages\3_📥_Import_Data.py" />
+    <Compile Include="pages\4_📄_Export_Report.py" />
+    <Compile Include="pages\5_🧠_AI_Data_Intelligence.py" />
+    <Compile Include="utils\auth.py" />
+    <Compile Include="utils\sidebar.py" />
+    <Compile Include="utils\SIDEBAR_INTEGRATION.py" />
+    <Compile Include="utils\snowflake_connection.py" />
+    <Compile Include="utils\__init__.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="agents\" />
+    <Folder Include="images\" />
+    <Folder Include="images\kituwah_properties\" />
+    <Folder Include="pages\" />
+    <Folder Include="utils\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="images\kituwah_properties\brand_colors.json" />
+    <Content Include="images\kituwah_properties\logo.svg" />
+    <Content Include="images\kituwah_properties\logo_icon.svg" />
+    <Content Include="images\kituwah_properties\logo_white.svg" />
+    <Content Include="README.md" />
+    <Content Include="requirements.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

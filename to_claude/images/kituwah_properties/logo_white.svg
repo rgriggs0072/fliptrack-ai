@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 300 100">
+  <defs>
+    <style>
+      .wt0 { fill: #ffffff; font-family: Georgia-Bold, Georgia; font-weight: 700; font-size: 24px; }
+      .wt1 { fill: #ffffff; font-family: Georgia-Italic, Georgia; font-style: italic; font-size: 16px; }
+      .wt2 { fill: #ffffff; }
+      .wt3 { fill: #e8e8e8; }
+      .wt4 { fill: #64b5f6; }
+    </style>
+  </defs>
+  
+  <!-- Company name -->
+  <text class="wt0" transform="translate(10 30)"><tspan x="0" y="0">Kituwah Properties, LLC</tspan></text>
+  <text class="wt1" transform="translate(30 55)"><tspan x="0" y="0">"We buy &amp; sell houses"</tspan></text>
+  
+  <!-- Small house icon -->
+  <g transform="translate(230, -70) scale(0.35)">
+    <rect class="wt2" x="175" y="100" width="12" height="35"/>
+    <polygon class="wt2" points="150 130 80 180 220 180 150 130"/>
+    <polygon class="wt2" points="150 130 220 180 230 175 160 125 150 130"/>
+    <rect class="wt3" x="100" y="180" width="100" height="80"/>
+    <rect class="wt3" x="135" y="210" width="30" height="50" rx="2" ry="2"/>
+    <rect class="wt4" x="110" y="195" width="18" height="18"/>
+    <rect class="wt4" x="172" y="195" width="18" height="18"/>
+  </g>
+</svg>

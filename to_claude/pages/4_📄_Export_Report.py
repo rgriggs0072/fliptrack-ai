@@ -16,9 +16,6 @@ sys.path.append(str(Path(__file__).parent.parent))
 from utils.auth import check_authentication
 from utils.snowflake_connection import get_connection, get_client_database
 from utils.branding import get_brand, apply_custom_css
-from utils.page_shell import init_page
-
-brand, user_info = init_page("kituwah_properties")
 
 # Load brand
 brand = get_brand("kituwah_properties")
@@ -38,7 +35,7 @@ if not check_authentication():
     st.stop()
 
 # Header
-st.title("📄 Generate Reports")
+st.title("📄 Export Report")
 st.markdown("Generate professional Excel reports with AI")
 
 st.divider()

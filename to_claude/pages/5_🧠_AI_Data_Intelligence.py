@@ -16,9 +16,6 @@ from utils.auth import check_authentication
 from utils.snowflake_connection import get_connection, get_client_database
 from agents.query_agent import QueryAgent
 from utils.branding import get_brand, apply_custom_css
-from utils.page_shell import init_page
-
-brand, user_info = init_page("kituwah_properties")
 
 # Load brand
 brand = get_brand("kituwah_properties")

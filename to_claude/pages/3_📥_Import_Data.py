@@ -14,9 +14,6 @@ sys.path.append(str(Path(__file__).parent.parent))
 from utils.auth import check_authentication
 from agents.excel_import_agent import ExcelImportAgent
 from utils.branding import get_brand, apply_custom_css
-from utils.page_shell import init_page
-
-brand, user_info = init_page("kituwah_properties")
 
 # Load brand
 brand = get_brand("kituwah_properties")
